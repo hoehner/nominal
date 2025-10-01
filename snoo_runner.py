@@ -22,10 +22,8 @@ def snoo_cmd(cmd: str):
     snoo.read().rstrip()
 
 def main():
-    snoo_cmd("SNOO:FAN 90")
+    snoo_cmd("SNOO:WIGGLE OFF")
     try:
-        i = 1
-        delta_deg = 10
         while True:
             id = snoo_query("*IDN?")
             ping = snoo_query("PING?")
@@ -34,14 +32,11 @@ def main():
             fan = snoo_query("SNOO:FAN?")
             wiggle = snoo_query("SNOO:WIGGLE?")
             print(f'''ID: {id} | Ping: {ping} | Temp (F): {temp} | Sound (Eng): {mic} | Fan: {fan} | Wiggle: {wiggle}''')
-            
-            # snoo_cmd("SNOO:FAN " + str(90 + (delta_deg * i)))
-            i *= -1        # invert the wiggle delta for the next iteration
-
+            snoo_cmd("SNOO:WIGGLE HIGH")
             time.sleep(.1)
 
     except KeyboardInterrupt:
-        snoo_cmd("SNOO:FAN 90")
+        snoo_cmd("SNOO:WIGGLE OFF")
         print("SNOO back to nominal position")
 
 if __name__ == "__main__":
