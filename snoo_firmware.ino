@@ -24,6 +24,7 @@ void setup() {
   Serial.begin(115200);
   while (!Serial) { } // for native USB boards'
   wiggle_servo.attach(5);
+  pinMode(2, OUTPUT);
 }
 
 void loop() {
@@ -77,29 +78,41 @@ void loop() {
         snoo_mic = signalMax - signalMin;  // max - min = peak-peak amplitude
         Serial.println(snoo_mic);
       } else if (strcmp(line, "SNOO:FAN?") == 0) {            // Query - Get the SNOO:FAN status (ON/OFF)
-        Serial.println(snoo_fan, DEC);
+          if (snoo_fan == 1) {
+            Serial.println(F("ON"));
+            digitalWrite(2, HIGH);
+          } else if (snoo_fan == 0) {
+            Serial.println(F("OFF"));
+            digitalWrite(2, LOW);
+          } else {
+            Serial.println(F("ERR"));
+          }
       } else if (strcmp(line, "SNOO:WIGGLE?") == 0) {         // Query - Get SNOO:WIGGLE status (OFF/LOW/MED/HIGH)
           if (snoo_wiggle == 0) {
             Serial.println(F("OFF"));
-          } else if (snoo_wiggle == 60) {
+          } else if (snoo_wiggle == 30) {
             Serial.println(F("LOW"));
-          } else if (snoo_wiggle == 40) {
-            Serial.println(F("MED"));
           } else if (snoo_wiggle == 20) {
+            Serial.println(F("MED"));
+          } else if (snoo_wiggle == 10) {
             Serial.println(F("HIGH"));
           } else {
             Serial.println(F("ERR"));
           }
       } else if (strncmp(line, "SNOO:FAN ", 9) == 0) {        // Command - Set SNOO:FAN speed (ON/OFF)
-        snoo_fan = atof(line + 9);
+          if (strncmp(line + 9, "ON", 3) == 0) {
+            snoo_fan = 1;
+          } else {
+            snoo_fan = 0;
+          }
         Serial.println(F("ACCEPTED"));
       } else if (strncmp(line, "SNOO:WIGGLE ", 12) == 0) {     // Command - Set SNOO:WIGGLE status (OFF/LOW/MED/HIGH)
           if (strncmp(line + 12, "LOW", 3) == 0) {
-            snoo_wiggle = 60;
+            snoo_wiggle = 30;
           } else if (strncmp(line + 12, "MED", 3) == 0) {
-            snoo_wiggle = 40;
-          } else if (strncmp(line + 12, "HIGH", 4) == 0) {
             snoo_wiggle = 20;
+          } else if (strncmp(line + 12, "HIGH", 4) == 0) {
+            snoo_wiggle = 10;
           } else if (strncmp(line + 12, "OFF", 3) == 0) {
             snoo_wiggle = 0;
           } else {

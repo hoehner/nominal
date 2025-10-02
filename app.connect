@@ -1,0 +1,137 @@
+title: SNOO Demo
+
+python:
+  packages:
+    - pyvisa
+
+bottom_panel:
+  height: 0.15
+  layout:
+    - controls: script_table
+      scripts:
+        - path: snoo_runner.py
+          label: snoo_runner
+          id: "snoo_runner"
+
+left_panel:
+  width: 0.2
+  layout:
+    - display: header
+      label: Live Data
+      font_size: 30.0
+    - display: separator
+    - title: Temperature & Noise vs Time
+      plot: line
+      window: 60
+      stream_ids: ["cn_bed_temp", "cn_bed_noise"]
+      colors: ["yellow", "red"]
+      show_picker: false
+      show_legend: true
+      x_label: "Time"
+      x_format: timestamp
+      y_label: "Temperature (F)"
+      secondary_axis:
+        channels: ["cn_bed_noise.value"]
+        label: "Noise (Units)"
+
+    - display: separator
+
+    - display: logs
+      script_id: snoo_runner
+
+
+right_panel:
+  width: 0.1
+  layout:
+    - display: header
+      label: System Controls
+      font_size: 30.0
+    - display: separator
+    - display: gauge
+      radius: 150.0
+      zone_width: 15.0
+      stream_id: cn_bed_temp
+      title: Bed Temp
+      units: °F
+      min: 60.0
+      max: 90.0
+      zones:
+        - start: 60.0
+          end: 74.0
+          color: safe
+        - start: 74.1
+          end: 80.0
+          color: warn
+        - start: 80.1
+          end: 90.0
+          color: critical
+      chevron_size: 15.0
+      hysteresis: 0.25
+      refresh: 0.1
+
+    - display: separator
+
+    - input: toggle_switch
+      label: FAN STATE
+      id: fan_state
+
+    - display: separator
+
+    - display: indicator_light
+      radius: 10.0
+      colors:
+         lit: green
+         unlit: red
+      label: "  FAN FEEDBACK"
+      value_id: "cn_fan_fb"
+
+
+    - display: separator
+
+    - display: gauge
+      radius: 150.0
+      zone_width: 15.0
+      stream_id: cn_bed_noise
+      title: Bed Noise
+      font_size: 20
+      units: units
+      min: 0.0
+      max: 1000.0
+      zones:
+        - start: 0.0
+          end: 300.0
+          color: safe
+        - start: 300.1
+          end: 650.0
+          color: warn
+        - start: 650.1
+          end: 1000.0
+          color: critical
+      chevron_size: 15.0
+      hysteresis: 0.25
+      refresh: 0.1
+
+    - display: separator
+
+    - input: dropdown
+      label: WIGGLE SPEED
+      id: wiggle_speed
+      options: ["OFF", "LOW", "MED", "HIGH"]
+      default: "OFF"
+
+    - display: separator
+
+    - display: callout
+      height: 15.0
+      show_background: true
+      callout_type: info
+      message:
+        value_id: cn_wiggle_fb
+
+    - display: separator
+
+    - input: toggle_switch
+      label: AUTO MODE
+      id: auto_mode
+
+    - display: separator
